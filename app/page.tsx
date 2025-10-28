@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
+import { GeminiAi } from "./_components/GeminiAi";
 
 export default function Home() {
   // Text to Image
@@ -103,7 +104,6 @@ export default function Home() {
                 <p className="text-muted-foreground mt-2 mb-2 font-normal">
                   Upload a food photo, and AI will detect the ingredients.
                 </p>
-                {/* <Textarea placeholder="Choose File" /> */}
                 <div className="grid w-full max-w-sm items-center gap-3">
                   <Label htmlFor="picture">Picture</Label>
                   <Input id="picture" type="file" />
@@ -115,6 +115,7 @@ export default function Home() {
                   <img src="/file.svg"></img>
                   <p>Here is summary</p>
                 </div>
+                <GeminiAi></GeminiAi>
               </TabsContent>
 
               {/* Ingredient recognition === Text to text*/}
