@@ -17,6 +17,38 @@ export default function Home() {
   const [responseText, setResponseText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Image to Texts
+  const [imageFile, setImageFile] = useState("");
+  const [extractedText, setExtractedText] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
+
+  const ImageToText = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsExtracting(true);
+    setExtractedText("");
+    try {
+      const response = await fetch("/api/image-to-text", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageFile }),
+      });
+      const data = await response.json();
+
+      if (data.extractedText) {
+        setExtractedText(data.extractedText);
+      } else {
+        alert("Failed image to text");
+      }
+    } catch (error) {
+      console.log("Error:", error);
+      alert("failed image to text");
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const TextToImage = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -91,32 +123,54 @@ export default function Home() {
               </TabsList>
 
               {/* Image analysis === Image to text*/}
-              <TabsContent value="image">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <img src="/star.svg"></img>
-                    <div className="">Image analysis</div>
+              <form onSubmit={ImageToText}>
+                <TabsContent value="image">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img src="/star.svg"></img>
+                      <div className="">Image analysis</div>
+                    </div>
+                    <div className="w-12 h-10">
+                      <img src="/Button.svg"></img>
+                    </div>
                   </div>
-                  <div className="w-12 h-10">
-                    <img src="/Button.svg"></img>
+                  <p className="text-muted-foreground mt-2 mb-2 font-normal">
+                    Upload a food photo, and AI will detect the ingredients.
+                  </p>
+                  <div className="grid w-full max-w-sm items-center gap-3">
+                    <Label htmlFor="picture">Picture</Label>
+                    <Input
+                      id="picture"
+                      type="file"
+                      value={imageFile}
+                      onChange={(e) => setImageFile(e.target.value)}
+                    />
                   </div>
-                </div>
-                <p className="text-muted-foreground mt-2 mb-2 font-normal">
-                  Upload a food photo, and AI will detect the ingredients.
-                </p>
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="picture">Picture</Label>
-                  <Input id="picture" type="file" />
-                </div>
-                <Button className="mt-2 grid justify-self-end hover:bg-gray-500">
-                  Generate
-                </Button>
-                <div className="mt-12 gap-2 flex items-center">
-                  <img src="/file.svg"></img>
-                  <p>Here is summary</p>
-                </div>
-                <GeminiAi></GeminiAi>
-              </TabsContent>
+                  <Button
+                    className="mt-2 grid justify-self-end hover:bg-gray-500"
+                    type="submit"
+                    disabled={isExtracting || !imageFile}
+                  >
+                    {isExtracting ? "Generatng..." : "Generate"}
+                  </Button>
+                  <div className="mt-12 gap-2 flex items-center">
+                    <img src="/file.svg"></img>
+                    <p>Here is summary</p>
+                  </div>
+                  <div className="text-muted-foreground mt-2 font-normal text-sm">
+                    {isExtracting
+                      ? "Working ..."
+                      : "First, enter your image to recognize an ingredients."}
+                  </div>
+                  <div className="border w-full h-fit rounded-lg mt-2">
+                    {extractedText && (
+                      <p className="m-4 whitespace-pre-wrap text-sm">
+                        {extractedText}
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
+              </form>
 
               {/* Ingredient recognition === Text to text*/}
               <form onSubmit={TextToText} className="w-full">
@@ -212,6 +266,10 @@ export default function Home() {
               </form>
             </Tabs>
           </div>
+        </div>
+        <div className="h-35"></div>
+        <div className="m-9 flex-1 overflow-auto justify-self-end ">
+          <GeminiAi />
         </div>
       </div>
     </div>

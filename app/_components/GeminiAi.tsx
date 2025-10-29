@@ -30,7 +30,7 @@ export const GeminiAi = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="">
+      <DropdownMenuTrigger>
         <img src="/chat.svg"></img>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[380px] h-[472px]">
