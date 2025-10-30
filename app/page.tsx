@@ -267,7 +267,7 @@ export default function Home() {
             </Tabs>
           </div>
         </div>
-        <div className="h-35"></div>
+        <div className="h-20"></div>
         <div className="m-9 flex-1 overflow-auto justify-self-end ">
           <GeminiAi />
         </div>

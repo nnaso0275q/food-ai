@@ -1,7 +1,7 @@
 import { InferenceClient } from "@huggingface/inference";
 import { NextRequest, NextResponse } from "next/server";
 
-// const hf = new InferenceClient(process.env.HF_TOKEN || "")
+const hf = new InferenceClient(process.env.HF_TOKEN || "");
 export async function POST(req: NextRequest) {
   try {
     const { imageFile } = await req.json();
@@ -12,23 +12,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const response = (await hf.ImageToText({
-      model: "datalab-to/chandra",
-      inputs: `${imageFile}`,
-      //               messages: [
-      //         {
-      //           role: "user",
-      //           content: `Extract only the ingredients from this food description and return them as a simple comma-separated list without any explanation.
-      // Food description: ${imageFile}
-      // Ingredients:`,
-      //         },
-      //       ],
-    })) as unknown as Blob;
-
-    const extractedText = response.choices[0]?.message?.content || "";
+    const response = await hf.imageToText({
+      model: "nlpconnect/vit-gpt2-image-captioning",
+      inputs: imageFile,
+    });
 
     return NextResponse.json({
-      response: extractedText.trim(),
+      response: response.generated_text,
     });
   } catch (error) {
     console.log("Error extracted text:", error);
