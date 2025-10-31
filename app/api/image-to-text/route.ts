@@ -1,30 +1,18 @@
-import { InferenceClient } from "@huggingface/inference";
+import { GoogleGenAI } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 
-const hf = new InferenceClient(process.env.HF_TOKEN || "");
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 export async function POST(req: NextRequest) {
-  try {
-    const { imageFile } = await req.json();
+  const { imageFile } = await req.json();
 
-    if (!imageFile) {
-      return NextResponse.json(
-        { error: "imageFile is required" },
-        { status: 400 }
-      );
-    }
-    const response = await hf.imageToText({
-      model: "nlpconnect/vit-gpt2-image-captioning",
-      inputs: imageFile,
-    });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `Upload an image and let AI describe what it sees.
 
-    return NextResponse.json({
-      response: response.generated_text,
-    });
-  } catch (error) {
-    console.log("Error extracted text:", error);
-    return NextResponse.json(
-      { error: "Failed to extracted text" },
-      { status: 500 }
-    );
-  }
+Our system uses advanced vision models to analyze the content of your image and instantly generate a clear, human-like text description.
+User question: "${imageFile}"`,
+  });
+  console.log(response.text);
+  return NextResponse.json({ message: response.text });
 }
